@@ -6,10 +6,10 @@ httpx==0.25.1
 python-multipart==0.0.6
 openai>=1.50.0
 pillow>=10.1.0
-pytesseract==0.3.10
 websockets>=15.0.1
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 aiofiles==23.2.1
-
 requests==2.31.0
+mangum==0.17.0

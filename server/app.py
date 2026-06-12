@@ -1,11 +1,18 @@
 # INFINITY API Gateway (Multi-mode Entry Point)
+import sys
+import os
+
+# Ensure the server directory is in the Python path for Vercel serverless
+SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
+if SERVER_DIR not in sys.path:
+    sys.path.insert(0, SERVER_DIR)
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 from sqlalchemy import text
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import os
 import traceback
 import uvicorn
 
@@ -16,6 +23,7 @@ from api.routes import history as history_route
 import database.temporal_anchor  # noqa: F401 — registers models with SQLAlchemy
 from services.socket_manager import manager
 from services.analytics import get_live_metrics
+
 
 app = FastAPI(
     title="INFINITY API",
@@ -127,5 +135,13 @@ def main():
     """Start the INFINITY API server."""
     uvicorn.run(app, host="0.0.0.0", port=7860, reload=False)
 
+# Vercel Serverless Handler
+try:
+    from mangum import Mangum
+    handler = Mangum(app)
+except ImportError:
+    pass
+
 if __name__ == "__main__":
     main()
+
