@@ -240,10 +240,12 @@ def analyze_communication(message: str) -> dict:
 def generate_roadmap(goal: str) -> dict:
     """Generate a 5-7 phase career roadmap with multiple retries and a high-reliability fallback."""
     system_prompt = (
-        "Role: Expert Career Coach. Task: Generate a detailed career roadmap. "
+        "Role: Expert Career Coach. Task: Generate a detailed career roadmap with SHORT, ACTIONABLE timeframes. "
+        "IMPORTANT: Each phase duration MUST be in WEEKS (e.g. '2 weeks', '3 weeks'). Do NOT use months or years. "
+        "The total roadmap should be completable within 12-24 weeks. "
         "Strict Rule: Return ONLY a JSON object with the exact keys: 'goal', 'estimated_duration', 'phases'. "
         "Each phase MUST include: 'id', 'title', 'duration', 'description', 'skills' (list), 'milestone'. "
-        "Example structure: {\"goal\": \"...\", \"estimated_duration\": \"...\", \"phases\": [{\"id\":1, \"title\":\"...\", ...}]}"
+        "Example structure: {\"goal\": \"...\", \"estimated_duration\": \"16 weeks\", \"phases\": [{\"id\":1, \"title\":\"...\", \"duration\": \"3 weeks\", ...}]}"
     )
 
     data = {}
@@ -290,12 +292,14 @@ def generate_roadmap(goal: str) -> dict:
 
     # ── Standardize Durations & IDs ───────────────────────────────────────────
     final_phases = data.get("phases", [])
-    PHASE_DURATIONS = ["1-2 weeks", "2-3 weeks", "3-4 weeks", "4-5 weeks", "2-3 weeks", "3-4 weeks", "2-3 weeks"]
+    PHASE_DURATIONS = ["2 weeks", "3 weeks", "3 weeks", "4 weeks", "3 weeks", "3 weeks", "2 weeks"]
     
     for i, phase in enumerate(final_phases):
         # Enforce consistency regardless of AI output
         phase["id"] = i + 1
-        if "duration" not in phase or not phase["duration"]:
+        # Always override duration to use weeks — never allow months/years
+        dur = str(phase.get("duration", "")).lower()
+        if "year" in dur or "month" in dur or not dur:
             phase["duration"] = PHASE_DURATIONS[min(i, len(PHASE_DURATIONS)-1)]
         phase.setdefault("completed", False)
         phase.setdefault("skills", ["Professional Skill"])
@@ -304,8 +308,8 @@ def generate_roadmap(goal: str) -> dict:
     total_weeks = 0
     for p in final_phases:
         try:
-            parts = str(p.get("duration", "2")).split("-")[0].replace(" weeks", "").strip()
-            total_weeks += int(parts[0]) if parts.isdigit() else 2
+            parts = str(p.get("duration", "2")).split("-")[0].replace(" weeks", "").replace(" week", "").strip()
+            total_weeks += int(parts) if parts.isdigit() else 2
         except: total_weeks += 2
 
     data["phases"] = final_phases
