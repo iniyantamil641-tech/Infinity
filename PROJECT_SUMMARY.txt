@@ -1,0 +1,83 @@
+================================================================================
+                           INFINITY: PROJECT SUMMARY
+================================================================================
+
+1. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+INFINITY is a personal AI-powered career development and learning platform. 
+It acts as a digital "AI Twin" designed to help tech professionals and students 
+upskill, track their progress, analyze their resumes, and plan their daily or 
+weekly learning objectives. 
+
+The application provides intelligent, context-aware suggestions utilizing advanced 
+Large Language Models (LLMs) to act as a 24/7 career coach and roadmap architect.
+
+2. ARCHITECTURE & TECH STACK
+--------------------------------------------------------------------------------
+INFINITY is built as a modern Full-Stack Monorepo:
+
+[Frontend]
+- Framework: React 18 powered by Vite.
+- Routing: React Router DOM (v6).
+- Styling: Custom Vanilla CSS with a highly aesthetic, dark-mode glassmorphism UI.
+- Animations: Framer Motion.
+- Data Visualization: Recharts (for progress tracking).
+
+[Backend]
+- Framework: Python / FastAPI (High performance, async-ready).
+- Database: SQLite (SQLAlchemy ORM).
+- Authentication: Custom JWT (JSON Web Tokens) with strict Bcrypt password hashing.
+- AI Integration: NVIDIA NIM APIs utilizing `meta/llama3-70b-instruct` for deep 
+  reasoning and text generation.
+- Serverless Wrapper: Mangum (allows FastAPI to run in serverless environments).
+
+[Deployment]
+- Platform: Vercel.
+- Configuration: A custom `vercel.json` routes `/api/*` traffic to the Python 
+  serverless functions while serving the built React static assets natively. 
+- Due to Vercel's read-only file system, the SQLite database is intelligently 
+  routed to `/tmp/ai_twin.db` during serverless execution.
+
+3. CORE FEATURES & MODULES
+--------------------------------------------------------------------------------
+A) Authentication & Security
+   - Secure Signup/Login flows using cryptographically strong hashing.
+   - Protected API routes requiring Bearer tokens.
+
+B) AI Career Roadmap Generator
+   - Users input a target career goal (e.g., "Senior Cloud Architect").
+   - The AI generates a structured, multi-phase roadmap with actionable skills 
+     and week-based durations.
+   - Users can mark phases as completed, tracking their macro-level progress.
+
+C) AI Resume Analyzer
+   - Users can upload a resume.
+   - The system analyzes the text, scoring the user across multiple categories 
+     (Programming Languages, Frameworks, Cloud/DevOps, Soft Skills).
+   - Identifies "Missing Skills" and provides "Improvement Tips".
+
+D) Daily & Weekly Planner
+   - A task management system where users can manually create objectives or 
+     trigger an "Infinity Refresh" to have the AI generate a targeted study plan.
+   - Includes priority tracking, time duration, and categorization.
+
+E) Communication & Code Coach (Oracle)
+   - Built-in AI agents that analyze written communication for professional tone,
+     or review code snippets for optimization and security.
+
+4. RECENT SYSTEM FIXES & OPTIMIZATIONS
+--------------------------------------------------------------------------------
+- Vercel Monorepo Routing: Fixed SPA fallback routing to allow direct URL access 
+  to React routes without hitting 404 errors.
+- NPM Peer Dependencies: Added an `.npmrc` file to forcefully resolve Vite plugin 
+  conflicts during Vercel's deployment phase.
+- Serverless Database: Overrode the SQLite database path to use `/tmp` to bypass 
+  Vercel's read-only filesystem restrictions.
+- UI Task Deletion Fix: Resolved a 422 Unprocessable Entity error by ensuring 
+  React waits for database integer IDs before rendering newly generated AI tasks.
+- Actionable AI Timelines: Constrained the LLM prompt to strictly generate 
+  roadmaps in "weeks" rather than vague "years", ensuring practical usage.
+
+================================================================================
+                         End of Project Summary
+================================================================================
