@@ -81,28 +81,35 @@ export default function Planner() {
     const manualTasks = plan?.tasks ? plan.tasks.filter(t => !t.is_ai) : []
     const aiTasks = plan?.tasks ? plan.tasks.filter(t => t.is_ai) : []
     setPlan(prev => ({ ...prev, tasks: manualTasks }))
+    
+    // Fire off deletes for old AI tasks
     aiTasks.forEach(t => plannerAPI.delete(t.id).catch(() => {}))
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const template = EXPERT_TEMPLATES[Math.floor(Math.random() * EXPERT_TEMPLATES.length)]
-      const generated = template.tasks.map((t, idx) => ({
-        id: `gen-${Date.now()}-${idx}`,
+      const payloads = template.tasks.map((t) => ({
         ...t,
-        completed: false,
-        is_ai: true,
         planner_type: mode,
         date: plan?.date || new Date().toISOString().split('T')[0]
       }))
 
-      setPlan(prev => ({ 
-        ...prev, 
-        focus_area: template.focus, 
-        motivation: template.motivation, 
-        tasks: [...manualTasks, ...generated] 
-      }))
-      setRegen(false)
-      setIsVoid(false)
-      generated.forEach(t => plannerAPI.add(t).catch(() => {}))
+      try {
+        // Wait for actual DB creation so we get REAL integer IDs
+        const res = await Promise.all(payloads.map(p => plannerAPI.add(p)))
+        const generatedTasks = res.map(r => r.data)
+
+        setPlan(prev => ({ 
+          ...prev, 
+          focus_area: template.focus, 
+          motivation: template.motivation, 
+          tasks: [...manualTasks, ...generatedTasks] 
+        }))
+      } catch (err) {
+        console.error("Error creating AI tasks", err)
+      } finally {
+        setRegen(false)
+        setIsVoid(false)
+      }
     }, 600)
   }, [mode, plan])
 
