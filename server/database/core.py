@@ -9,11 +9,17 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # database/
 PROJECT_ROOT = os.path.dirname(BASE_DIR)              # server/
-DEFAULT_DB_PATH = os.path.join(PROJECT_ROOT, "ai_twin.db")
+
+# On Vercel, the filesystem is read-only except /tmp
+if os.environ.get("VERCEL"):
+    DEFAULT_DB_PATH = "/tmp/ai_twin.db"
+else:
+    DEFAULT_DB_PATH = os.path.join(PROJECT_ROOT, "ai_twin.db")
 
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DEFAULT_DB_PATH}")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
