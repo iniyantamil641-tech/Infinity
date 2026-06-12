@@ -13,18 +13,13 @@
       "use": "@vercel/python"
     }
   ],
-  "rewrites": [
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/server/app.py" },
+    { "src": "/ws/(.*)", "dest": "/server/app.py" },
     {
-      "source": "/api/(.*)",
-      "destination": "/server/app.py"
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|json|map))$",
+      "dest": "/client/$1"
     },
-    {
-      "source": "/ws/(.*)",
-      "destination": "/server/app.py"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/client/dist/index.html"
-    }
+    { "src": "/(.*)", "dest": "/client/index.html" }
   ]
 }
