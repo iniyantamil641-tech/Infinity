@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { useSidebar } from '../context/SidebarContext.jsx'
@@ -38,34 +38,7 @@ const styles = {
     borderBottom: '1px solid var(--border)',
     textDecoration: 'none',
   },
-  logoIcon: {
-    width: '38px',
-    height: '38px',
-    background: 'var(--grad-primary)',
-    borderRadius: '10px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '18px',
-    flexShrink: 0,
-    boxShadow: '0 4px 16px rgba(124,58,237,0.4)',
-  },
-  logoText: {
-    fontFamily: 'var(--font-display)',
-    fontSize: '1.1rem',
-    fontWeight: '800',
-    background: 'var(--grad-text)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-  },
-  logoSub: {
-    fontSize: '0.65rem',
-    color: 'var(--text-muted)',
-    fontWeight: '500',
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-  },
+
   nav: {
     flex: 1,
     padding: '16px 12px',
@@ -139,12 +112,8 @@ export default function Sidebar() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 10 }}>
-        <Link to="/dashboard" style={styles.logo} onClick={isMobile ? close : undefined}>
-          <div style={styles.logoIcon}>🤖</div>
-          <div style={{ minWidth: 0 }}>
-            <div style={styles.logoText}>INFINITY</div>
-            <div style={styles.logoSub}>Neural Engine</div>
-          </div>
+        <Link to="/dashboard" style={{ ...styles.logo, padding: '16px 20px', justifyContent: 'center' }} onClick={isMobile ? close : undefined}>
+          <img src="/logo.png" alt="Infinity Logo" style={{ width: '100%', maxWidth: '180px', height: 'auto', objectFit: 'contain' }} />
         </Link>
         {isMobile && (
           <button 
